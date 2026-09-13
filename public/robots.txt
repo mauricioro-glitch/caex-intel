@@ -1,0 +1,5 @@
+# CAEX Intelligence — https://intel.caex.earth
+User-agent: *
+Allow: /
+
+Sitemap: https://intel.caex.earth/sitemap.xml
