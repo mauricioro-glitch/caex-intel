@@ -1,140 +1,87 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>CAEX Intelligence | Verra Carbon Market Data & Analytics</title>
+<title>CAEX Intelligence | Carbon Market Data</title>
 
 <meta name="description"
-content="Independent carbon market intelligence based on Verra registry data. Track projects, issuances, retirements and market trends.">
-
-<meta name="keywords"
-content="Verra, carbon credits, VCU, retirements, issuances, carbon market, voluntary carbon market">
-
-<meta property="og:title"
-content="CAEX Intelligence">
-
-<meta property="og:description"
-content="Carbon market intelligence powered by Verra registry analytics">
-
-<meta property="og:type"
-content="website">
-
-<meta name="robots"
-content="index, follow">
+content="Daily carbon market intelligence from Verra projects, issuances and retirements.">
 
 <style>
 
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-}
-
 body{
-font-family:Arial, Helvetica, sans-serif;
+font-family:Arial,Helvetica,sans-serif;
+margin:0;
 background:#f8fafc;
 color:#111827;
-line-height:1.6;
 }
 
 header{
 background:#0f172a;
 color:white;
-padding:80px 20px;
+padding:60px 20px;
 text-align:center;
 }
 
-header h1{
-font-size:54px;
-margin-bottom:20px;
+h1{
+font-size:48px;
+margin-bottom:10px;
 }
 
-header p{
-font-size:22px;
-max-width:800px;
-margin:auto;
+.subtitle{
+font-size:20px;
 opacity:0.9;
 }
 
 .container{
 max-width:1200px;
 margin:auto;
-padding:60px 20px;
+padding:40px 20px;
 }
 
 .cards{
 display:grid;
 grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-gap:25px;
-margin-bottom:50px;
+gap:20px;
 }
 
 .card{
 background:white;
 padding:30px;
 border-radius:12px;
-box-shadow:0 2px 10px rgba(0,0,0,0.08);
-text-align:center;
-}
-
-.card h3{
-margin-bottom:10px;
+box-shadow:0 2px 8px rgba(0,0,0,0.08);
 }
 
 .metric{
-font-size:48px;
+font-size:42px;
 font-weight:bold;
-color:#16a34a;
-}
-
-.section{
-background:white;
-padding:40px;
-border-radius:12px;
-box-shadow:0 2px 10px rgba(0,0,0,0.08);
-margin-bottom:40px;
-}
-
-.section h2{
-margin-bottom:15px;
+margin-top:10px;
 }
 
 .newsletter{
 background:white;
 padding:40px;
+margin-top:40px;
 border-radius:12px;
-box-shadow:0 2px 10px rgba(0,0,0,0.08);
-}
-
-.newsletter h2{
-margin-bottom:15px;
-}
-
-.newsletter p{
-margin-bottom:20px;
+box-shadow:0 2px 8px rgba(0,0,0,0.08);
 }
 
 input{
-padding:14px;
-width:350px;
+padding:12px;
+width:300px;
 max-width:100%;
-border:1px solid #d1d5db;
-border-radius:6px;
+margin-right:10px;
 }
 
 button{
-padding:14px 24px;
+padding:12px 20px;
 background:#16a34a;
 color:white;
 border:none;
-border-radius:6px;
 cursor:pointer;
-font-weight:bold;
-margin-left:10px;
+border-radius:4px;
 }
 
 button:hover{
@@ -150,13 +97,11 @@ footer{
 margin-top:60px;
 padding:40px;
 text-align:center;
-background:#0f172a;
-color:white;
+color:#666;
 }
 
-a{
-color:#16a34a;
-text-decoration:none;
+ul{
+line-height:1.8;
 }
 
 </style>
@@ -169,8 +114,9 @@ text-decoration:none;
 
 <h1>CAEX Intelligence</h1>
 
-<p>
-Independent carbon market intelligence powered by registry analytics and market research.
+<p class="subtitle">
+Independent intelligence platform covering Verra carbon projects,
+issuances, retirements and market activity.
 </p>
 
 </header>
@@ -180,52 +126,22 @@ Independent carbon market intelligence powered by registry analytics and market 
 <div class="cards">
 
 <div class="card">
-<h3>Verra Projects</h3>
+<h3>Projects</h3>
 <div class="metric">4,144</div>
+<p>Registered carbon projects tracked.</p>
 </div>
 
 <div class="card">
 <h3>Issuances</h3>
 <div class="metric">11,194</div>
+<p>Historical issuance records available.</p>
 </div>
 
 <div class="card">
 <h3>Retirements</h3>
 <div class="metric">69,474</div>
+<p>Retirement transactions analyzed.</p>
 </div>
-
-</div>
-
-<div class="section">
-
-<h2>What is CAEX Intelligence?</h2>
-
-<p>
-CAEX Intelligence provides independent analysis of voluntary carbon markets,
-with a focus on Verra projects, credit issuances, retirements,
-methodologies and market trends.
-</p>
-
-<br>
-
-<p>
-Our objective is to transform complex registry data into actionable insights
-for project developers, investors, buyers and market participants.
-</p>
-
-</div>
-
-<div class="section">
-
-<h2>Coming Soon</h2>
-
-<ul>
-<li>Weekly retirement trends</li>
-<li>Methodology intelligence</li>
-<li>Project analytics</li>
-<li>Buyer behavior insights</li>
-<li>Market reports</li>
-</ul>
 
 </div>
 
@@ -235,13 +151,13 @@ for project developers, investors, buyers and market participants.
 
 <p>
 Receive weekly insights on carbon markets,
-retirement trends, methodologies and market developments.
+buyers, methodologies, retirement trends and market developments.
 </p>
 
 <input
-id="email"
 type="email"
-placeholder="Your email address">
+id="email"
+placeholder="Your email">
 
 <button onclick="subscribe()">
 Subscribe
@@ -251,17 +167,61 @@ Subscribe
 
 </div>
 
+<section style="margin-top:50px">
+
+<h2>About CAEX Intelligence</h2>
+
+<p>
+CAEX Intelligence provides independent analysis of the voluntary carbon market using public registry data.
+The platform focuses on Verra project activity, issuance trends, retirement behavior, buyer participation and methodology performance.
+</p>
+
+<p>
+Our objective is to transform raw registry information into practical market intelligence for project developers, investors, buyers, consultants and policymakers.
+</p>
+
+</section>
+
+<section style="margin-top:50px">
+
+<h2>What We Track</h2>
+
+<ul>
+<li>Carbon project registrations</li>
+<li>VCU issuances</li>
+<li>VCU retirements</li>
+<li>Corporate buyers</li>
+<li>Methodology trends</li>
+<li>Country-level activity</li>
+<li>Voluntary carbon market developments</li>
+</ul>
+
+</section>
+
+<section style="margin-top:50px">
+
+<h2>Coming Soon</h2>
+
+<p>
+Interactive dashboards will soon provide detailed analysis of:
+</p>
+
+<ul>
+<li>Top retirement buyers</li>
+<li>Retirement activity by country</li>
+<li>Retirement activity by methodology</li>
+<li>Daily market activity</li>
+<li>Issuance trends</li>
+<li>Project-level intelligence</li>
+</ul>
+
+</section>
+
 </div>
 
 <footer>
 
-<p>
 CAEX Intelligence © 2026
-</p>
-
-<p>
-Powered by CAEX Earth
-</p>
 
 </footer>
 
@@ -269,17 +229,16 @@ Powered by CAEX Earth
 
 async function subscribe() {
 
-const email =
-document.getElementById('email').value;
+const email = document.getElementById('email').value;
 
-if(!email){
+if (!email) {
+document.getElementById('message').innerHTML =
+'Please enter an email address.';
+return;
+}
 
 document.getElementById('message').innerHTML =
-'Please enter a valid email address';
-
-return;
-
-}
+'Submitting...';
 
 try {
 
@@ -289,6 +248,7 @@ const response = await fetch(
 method:'POST',
 headers:{
 'apikey':'sb_publishable_eukKMi5FlYPyGg-ne8aGfA_t-BkWjAX',
+'Authorization':'Bearer sb_publishable_eukKMi5FlYPyGg-ne8aGfA_t-BkWjAX',
 'Content-Type':'application/json',
 'Prefer':'return=minimal'
 },
@@ -301,21 +261,23 @@ email:email
 if(response.ok){
 
 document.getElementById('message').innerHTML =
-'✅ Successfully subscribed';
+'✅ Subscription successful';
 
-document.getElementById('email').value = '';
+document.getElementById('email').value='';
 
-}else{
+} else {
+
+const errorText = await response.text();
 
 document.getElementById('message').innerHTML =
-'Email already registered';
+'❌ Error: ' + errorText;
 
 }
 
-}catch(error){
+} catch(error){
 
 document.getElementById('message').innerHTML =
-'Subscription error';
+'❌ Network error: ' + error.message;
 
 }
 
@@ -324,5 +286,4 @@ document.getElementById('message').innerHTML =
 </script>
 
 </body>
-
 </html>
