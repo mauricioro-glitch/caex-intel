@@ -29,14 +29,17 @@ if (!SUPABASE_URL || !SERVICE_KEY) {
    PostgREST devolve no máximo 1000 linhas por vez, então paginamos.
    --------------------------------------------------------------- */
 
-async function fetchAll(table, columns) {
+async function fetchAll(table, columns, orderBy) {
   const rows = [];
   const pageSize = 1000;
 
+  // A ordem explícita é obrigatória. Sem ela o Postgres não garante a mesma
+  // sequência entre uma página e outra, e linhas vêm duplicadas ou faltando.
   for (let offset = 0; ; offset += pageSize) {
     const url =
       `${SUPABASE_URL}/rest/v1/${table}` +
       `?select=${encodeURIComponent(columns)}` +
+      `&order=${encodeURIComponent(orderBy)}` +
       `&limit=${pageSize}&offset=${offset}`;
 
     const response = await fetch(url, {
@@ -65,6 +68,49 @@ async function fetchAll(table, columns) {
 /* ---------------------------------------------------------------
    Normalização
    --------------------------------------------------------------- */
+
+// "Natura CosmÃ©ticos" -> "Natura Cosméticos".
+// Texto UTF-8 que foi lido como Latin-1 em algum ponto antes de chegar aqui.
+function repairEncoding(text) {
+  if (typeof text !== "string" || !/[ÃÂ][\u0080-\u00BF]/.test(text)) return text;
+  try {
+    const fixed = Buffer.from(text, "latin1").toString("utf8");
+    return fixed.includes("\uFFFD") ? text : fixed;
+  } catch {
+    return text;
+  }
+}
+
+// O registro da Verra usa nomes formais da ISO. As pessoas pesquisam pelo
+// nome corrente, então é ele que vai no título, no texto e no endereço.
+const COUNTRY_NAMES = {
+  "Mainland China": "China",
+  "United States of America": "United States",
+  "Tanzania, United Republic of": "Tanzania",
+  "Lao People's Democratic Republic": "Laos",
+  "Congo (Democratic Republic of)": "Democratic Republic of the Congo",
+  "Congo": "Republic of the Congo",
+  "Korea (Republic of)": "South Korea",
+  "Korea (Democratic People's Republic of)": "North Korea",
+  "Russian Federation": "Russia",
+  "Syrian Arab Republic": "Syria",
+  "Iran (Islamic Republic of)": "Iran",
+  "Bolivia (Plurinational State of)": "Bolivia",
+  "Venezuela (Bolivarian Republic of)": "Venezuela",
+  "Moldova (Republic of)": "Moldova",
+  "Micronesia (Federated States of)": "Micronesia",
+  "Taiwan, Province of China": "Taiwan",
+  "Viet Nam": "Vietnam",
+  "Brunei Darussalam": "Brunei",
+  "Cabo Verde": "Cape Verde",
+  "Czechia": "Czech Republic",
+  "Türkiye": "Turkey",
+};
+
+const countryName = (raw) => {
+  const clean = repairEncoding((raw ?? "").trim());
+  return COUNTRY_NAMES[clean] ?? clean;
+};
 
 const slugify = (text) =>
   (text ?? "")
@@ -98,7 +144,7 @@ const esc = (text) =>
    Componentes de página
    --------------------------------------------------------------- */
 
-function layout({ title, description, canonical, jsonLd, body }) {
+function layout({ title, description, canonical, jsonLd, body, robots }) {
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -106,7 +152,7 @@ function layout({ title, description, canonical, jsonLd, body }) {
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${esc(title)}</title>
 <meta name="description" content="${esc(description)}">
-<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="robots" content="${robots ?? "index, follow, max-image-preview:large"}">
 <link rel="canonical" href="${canonical}">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="CAEX Intelligence">
@@ -235,7 +281,7 @@ function countryPage(country, neighbours, totalCountries) {
     ${table(
       ["Project", "Methodology", "Annual credits"],
       topProjects.map((p) => [
-        esc(p.project_name ?? "Unnamed project"),
+        esc(repairEncoding(p.project_name) ?? "Unnamed project"),
         esc(splitMethodologies(p.methodologies)[0] ?? "—"),
         fmt(p.avg_annual_vol_vcu),
       ])
@@ -276,6 +322,9 @@ ${topBuyers.length
     title: `Carbon Projects in ${name} | Verra Registry Data | CAEX Intelligence`,
     description,
     canonical: `${SITE}/country/${slug}/`,
+    robots: country.indexable
+      ? "index, follow, max-image-preview:large"
+      : "noindex, follow",
     jsonLd: {
       "@context": "https://schema.org",
       "@type": "BreadcrumbList",
@@ -374,9 +423,9 @@ async function main() {
   console.log("\nLendo o banco de dados…");
 
   const [projects, retirements, issuances] = await Promise.all([
-    fetchAll("projects", "project_id,project_name,status,country,methodologies,sectoral_scope,avg_annual_vol_vcu"),
-    fetchAll("retirements", "project_id,quantity,beneficial_owner,country,methodology"),
-    fetchAll("issuances", "project_id,quantity,country"),
+    fetchAll("projects", "project_id,project_name,status,country,methodologies,sectoral_scope,avg_annual_vol_vcu", "project_id"),
+    fetchAll("retirements", "id,project_id,quantity,beneficial_owner,country,methodology", "id"),
+    fetchAll("issuances", "id,project_id,quantity,country", "id"),
   ]);
 
   const indexable = projects.filter((p) => isIndexableStatus(p.status));
@@ -417,20 +466,21 @@ async function main() {
 
   const projectCountry = new Map();
   for (const p of indexable) {
-    if (!p.country || !p.country.trim()) continue;
-    const c = ensure(p.country.trim());
+    const display = countryName(p.country);
+    if (!display) continue;
+    const c = ensure(display);
     c.projects.push(p);
     projectCountry.set(p.project_id, c);
     for (const m of splitMethodologies(p.methodologies)) c.methodologies.add(m);
   }
 
   for (const r of retirements) {
-    const c = projectCountry.get(r.project_id) ?? (r.country ? byCountry.get(r.country.trim()) : null);
+    const c = projectCountry.get(r.project_id) ?? byCountry.get(countryName(r.country));
     if (!c) continue;
     c.retiredVcus += num(r.quantity);
     c.retirementCount += 1;
 
-    const owner = (r.beneficial_owner ?? "").trim();
+    const owner = repairEncoding((r.beneficial_owner ?? "").trim());
     if (owner) {
       const entry = c.buyers.get(owner) ?? { name: owner, vcus: 0, count: 0 };
       entry.vcus += num(r.quantity);
@@ -440,7 +490,7 @@ async function main() {
   }
 
   for (const i of issuances) {
-    const c = projectCountry.get(i.project_id) ?? (i.country ? byCountry.get(i.country.trim()) : null);
+    const c = projectCountry.get(i.project_id) ?? byCountry.get(countryName(i.country));
     if (c) c.issuedVcus += num(i.quantity);
   }
 
@@ -465,7 +515,17 @@ async function main() {
     c.topBuyers = [...c.buyers.values()]
       .sort((a, b) => b.vcus - a.vcus)
       .slice(0, 15);
+
+    // Páginas magras ficam acessíveis, mas fora do índice do Google.
+    // Um país com 2 projetos entra se tiver volume aposentado relevante.
+    c.indexable = c.projects.length >= 3 || c.retiredVcus > 0;
   }
+
+  const totalRetired = countries.reduce((sum, c) => sum + c.retiredVcus, 0);
+  const indexableCount = countries.filter((c) => c.indexable).length;
+  console.log(`\nTotal de créditos aposentados somados: ${fmt(totalRetired)}`);
+  console.log(`(o banco tem 145.940.299 — se não bater, a leitura está duplicando)`);
+  console.log(`Países indexáveis: ${indexableCount} de ${countries.length}`);
 
   // Escreve as páginas.
   const biggest = countries.slice(0, 12);
@@ -477,7 +537,9 @@ async function main() {
   for (const c of countries) {
     const neighbours = biggest.filter((n) => n.slug !== c.slug).slice(0, 10);
     await write(`country/${c.slug}/index.html`, countryPage(c, neighbours, countries.length));
-    urls.push({ path: `/country/${c.slug}/`, freq: "monthly", priority: "0.7" });
+    if (c.indexable) {
+      urls.push({ path: `/country/${c.slug}/`, freq: "monthly", priority: "0.7" });
+    }
   }
 
   await write("countries/index.html", countriesIndexPage(countries));
