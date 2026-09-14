@@ -1,0 +1,41 @@
+<svg viewBox="0 0 400 100" xmlns="http://www.w3.org/2000/svg">
+  <!-- Logo group - White version for dark backgrounds -->
+  <g transform="translate(10, 50)">
+    <!-- Globe icon on the left -->
+    <g transform="translate(30, -15)">
+      <!-- Globe circle with light gradient effect -->
+      <defs>
+        <radialGradient id="globeGradWhite" cx="30%" cy="30%">
+          <stop offset="0%" style="stop-color:#66BB6A;stop-opacity:1" />
+          <stop offset="100%" style="stop-color:#2fbf71;stop-opacity:1" />
+        </radialGradient>
+      </defs>
+      
+      <circle cx="0" cy="0" r="34" fill="url(#globeGradWhite)"/>
+      
+      <!-- Ocean overlay -->
+      <circle cx="0" cy="0" r="34" fill="#4FC3F7" opacity="0.15"/>
+      
+      <!-- Grid lines - brighter for dark bg -->
+      <line x1="-34" y1="0" x2="34" y2="0" stroke="#ffffff" stroke-width="1.8" opacity="0.8"/>
+      <line x1="0" y1="-34" x2="0" y2="34" stroke="#ffffff" stroke-width="1.8" opacity="0.8"/>
+      <ellipse cx="0" cy="0" rx="34" ry="17" fill="none" stroke="#ffffff" stroke-width="1.4" opacity="0.7"/>
+      <ellipse cx="0" cy="0" rx="17" ry="34" fill="none" stroke="#ffffff" stroke-width="1.4" opacity="0.7"/>
+      
+      <!-- LATAM landmass - lighter -->
+      <path d="M -6 -14 L -3 -17 L 1 -18 L 4 -16 L 6 -12 L 8 -6 L 8 0 L 7 7 L 5 12 L 3 16 L 1 18 L -1 17 L -3 14 L -5 9 L -6 3 L -7 -4 L -6 -14 Z" 
+            fill="#E8F5E9" opacity="0.95"/>
+      
+      <!-- Forest detail -->
+      <path d="M -3 -10 L 0 -12 L 3 -10 L 3 -5 L 1 0 L 0 2 L -2 0 L -3 -5 Z" 
+            fill="#A5D6A7" opacity="0.8"/>
+      
+      <!-- Highlight -->
+      <circle cx="-12" cy="-12" r="7" fill="#ffffff" opacity="0.5"/>
+    </g>
+    
+    <!-- Main text - white -->
+    <text x="80" y="0" font-family="'Segoe UI', Arial, sans-serif" font-size="70" font-weight="700" fill="#FFFFFF">Caex</text>
+    <text x="245" y="0" font-family="'Segoe UI', Arial, sans-serif" font-size="70" font-weight="300" fill="#E8F5E9">.earth</text>
+  </g>
+</svg>

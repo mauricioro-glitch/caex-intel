@@ -2,24 +2,41 @@
 
 Static site published at https://intel.caex.earth
 
+## How it works
+
+`build.mjs` reads the Supabase database and writes HTML files into `public/`.
+Cloudflare runs it on every push to `main`, then publishes `public/`.
+
+No data is fetched in the visitor's browser. Every page is a finished file.
+
+## Required settings in Cloudflare
+
+Settings > Variables and Secrets:
+
+    SUPABASE_URL          https://pvovmrgfbhuasgleyqpw.supabase.co
+    SUPABASE_SERVICE_KEY  the service_role key (secret)
+
+Settings > Build configuration:
+
+    Build command    npm install && node build.mjs
+    Deploy command   npx wrangler deploy
+    Version command  (leave empty)
+
 ## Structure
 
-    public/                 everything that goes live
-      index.html            homepage
+    build.mjs               page generator
+    wrangler.jsonc          Cloudflare publishing config
+    public/                 what goes live
+      index.html            homepage (hand-written)
       404.html              not-found page
-      robots.txt            crawler instructions
-      sitemap.xml           list of pages for Google
+      robots.txt
       assets/css/intel.css  shared stylesheet
       assets/images/        logo and favicon
-    wrangler.jsonc          Cloudflare publishing config
 
-## Publishing
-
-Cloudflare watches the `main` branch. Any commit triggers `npx wrangler deploy`,
-which uploads the contents of `public/`.
+Generated at build time and not committed: `public/country/`,
+`public/countries/`, `public/sitemap.xml`.
 
 ## Newsletter
 
-The signup form writes to the `newsletter_subscribers` table in Supabase using the
-publishable key. That key is safe in public code: row level security on the table
-permits inserts only, never reads.
+The signup form writes to `newsletter_subscribers` using the publishable key.
+That key is safe in public code: row level security permits inserts only.
